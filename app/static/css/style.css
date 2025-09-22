@@ -210,24 +210,91 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    align-items: center;
+    align-items: stretch;
 }
 
-.name-input {
+.login-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.login-form .form-group label {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.login-form .form-group small {
+    color: #666;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 0.2rem;
+}
+
+.name-input, .year-select {
     padding: 1rem 1.5rem;
     border: 3px solid #667eea;
     border-radius: 15px;
     font-size: 1.2rem;
     font-family: inherit;
     width: 100%;
-    max-width: 300px;
-    text-align: center;
+    background: white;
 }
 
-.name-input:focus {
+.name-input:focus, .year-select:focus {
     outline: none;
     border-color: #4ecdc4;
     box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+}
+
+.login-step {
+    transition: all 0.3s ease;
+}
+
+.welcome-new-user {
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+    color: #155724;
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+    text-align: center;
+    border: 2px solid #c3e6cb;
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.back-button {
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
+.back-button:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .start-button {

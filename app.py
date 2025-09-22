@@ -95,6 +95,34 @@ def check_achievements(user, progress, is_correct):
     
     return achievements
 
+def get_user_avatar(user_name):
+    """Get avatar image based on user name"""
+    if user_name.lower() == 'diana':
+        return 'images/diana_cartoon.png'
+    
+    # List of alternative avatar images for non-Diana users
+    avatars = [
+        'images/student_avatar_1.png',
+        'images/student_avatar_2.png', 
+        'images/student_avatar_3.png',
+        'images/student_avatar_4.png',
+        'images/student_avatar_5.png'
+    ]
+    
+    # Use hash of name to consistently assign same avatar to same user
+    import hashlib
+    name_hash = int(hashlib.md5(user_name.lower().encode()).hexdigest(), 16)
+    avatar_index = name_hash % len(avatars)
+    
+    selected_avatar = avatars[avatar_index]
+    
+    # Check if the avatar file exists, fallback to diana_cartoon.png if not
+    avatar_path = os.path.join(app.root_path, 'app/static', selected_avatar)
+    if os.path.exists(avatar_path):
+        return selected_avatar
+    else:
+        return 'images/diana_cartoon.png'  # Fallback to Diana's image
+
 # Database Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -131,18 +159,48 @@ def home():
     
     return render_template('home.html', user=user)
 
+@app.route('/check_user', methods=['POST'])
+def check_user():
+    """Check if user exists and return appropriate response"""
+    name = request.form.get('name', '').strip()
+    
+    if not name:
+        return jsonify({'error': 'Name is required'}), 400
+    
+    # Find existing user
+    user = User.query.filter_by(name=name).first()
+    
+    if user:
+        # Existing user - log them in directly
+        session['user_id'] = user.id
+        return jsonify({'exists': True, 'redirect': '/'})
+    else:
+        # New user - need to ask for year
+        return jsonify({'exists': False, 'name': name})
+
 @app.route('/login', methods=['POST'])
 def login():
+    """Create new user with name and year"""
     name = request.form.get('name', '').strip()
-    if not name:
+    current_year = request.form.get('current_year', type=int)
+    
+    if not name or not current_year:
         return redirect('/')
     
-    # Find existing user or create new one
+    # Validate year is in valid range
+    if current_year < 1 or current_year > 7:
+        current_year = 3  # Default to Primary 3
+    
+    # Check if user already exists (shouldn't happen with new flow)
     user = User.query.filter_by(name=name).first()
-    if not user:
-        user = User(name=name, current_year=3)
-        db.session.add(user)
-        db.session.commit()
+    if user:
+        session['user_id'] = user.id
+        return redirect('/')
+    
+    # Create new user
+    user = User(name=name, current_year=current_year)
+    db.session.add(user)
+    db.session.commit()
     
     session['user_id'] = user.id
     return redirect('/')
@@ -365,6 +423,12 @@ def logout():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'app/static'),
                           'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+# Template filters
+@app.template_filter('user_avatar')
+def user_avatar_filter(user_name):
+    """Template filter to get user avatar"""
+    return get_user_avatar(user_name)
 
 if __name__ == '__main__':
     with app.app_context():

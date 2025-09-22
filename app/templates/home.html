@@ -7,9 +7,13 @@
     <div class="welcome-section">
         <div class="welcome-content">
             <div class="diana-avatar">
-                <img src="{{ url_for('static', filename='images/diana_cartoon.png') }}" alt="Diana's Avatar" class="diana-image">
+                <img src="{{ url_for('static', filename=user.name|user_avatar) }}" alt="{{ user.name }}'s Avatar" class="diana-image">
                 <div class="speech-bubble">
+                    {% if user.name.lower() == 'diana' %}
                     <p>Hi! I'm ready for math! 🌟</p>
+                    {% else %}
+                    <p>Hi {{ user.name }}! Let's learn math together! 🌟</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="welcome-text">
@@ -99,11 +103,50 @@
         <p class="welcome-subtitle">Let's make math fun and exciting!</p>
         
         <div class="login-card">
-            <h2>👋 What's your name?</h2>
-            <form action="/login" method="POST" class="login-form">
-                <input type="text" name="name" placeholder="Enter your name..." required class="name-input">
-                <button type="submit" class="start-button">🚀 Start Learning!</button>
-            </form>
+            <!-- Step 1: Name Entry -->
+            <div id="step1" class="login-step">
+                <h2>👋 What's your name?</h2>
+                <form id="nameForm" class="login-form">
+                    <div class="form-group">
+                        <label for="name">📝 Enter your name</label>
+                        <input type="text" id="name" name="name" placeholder="Type your name here..." required class="name-input">
+                    </div>
+                    <button type="submit" class="start-button">Next ▶️</button>
+                </form>
+            </div>
+
+            <!-- Step 2: Year Selection (for new users only) -->
+            <div id="step2" class="login-step" style="display: none;">
+                <h2>📚 What Primary year are you in?</h2>
+                <p class="welcome-new-user">Welcome! Since you're new, we need to know your school year to give you the right math problems.</p>
+                <form id="yearForm" action="/login" method="POST" class="login-form">
+                    <input type="hidden" id="hiddenName" name="name" value="">
+                    <div class="form-group">
+                        <label for="current_year">📚 Select your Primary year</label>
+                        <select id="current_year" name="current_year" required class="year-select">
+                            <option value="">Choose your year...</option>
+                            <option value="1">Primary 1</option>
+                            <option value="2">Primary 2</option>
+                            <option value="3">Primary 3</option>
+                            <option value="4">Primary 4</option>
+                            <option value="5">Primary 5</option>
+                            <option value="6">Primary 6</option>
+                            <option value="7">Primary 7</option>
+                        </select>
+                        <small>This helps us give you the right level of math problems!</small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="back-button" onclick="goBackToStep1()">◀️ Back</button>
+                        <button type="submit" class="start-button">🚀 Start Learning!</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading state -->
+            <div id="loading" class="login-step" style="display: none;">
+                <h2>⏳ Checking...</h2>
+                <p>Please wait while we check your account...</p>
+            </div>
         </div>
         
         <div class="preview-section">
@@ -124,14 +167,77 @@
 
 {% block scripts %}
 <script>
-    // Add some fun animations when the page loads
+    // Two-step login functionality
     document.addEventListener('DOMContentLoaded', function() {
+        // Add some fun animations when the page loads
         const cards = document.querySelectorAll('.topic-card');
         cards.forEach((card, index) => {
             setTimeout(() => {
                 card.style.animation = 'bounceIn 0.6s ease-out';
             }, index * 100);
         });
+
+        // Handle step 1 form submission (name check)
+        const nameForm = document.getElementById('nameForm');
+        if (nameForm) {
+            nameForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const nameInput = document.getElementById('name');
+                const name = nameInput.value.trim();
+                
+                if (!name) {
+                    alert('Please enter your name!');
+                    return;
+                }
+                
+                // Show loading state
+                showStep('loading');
+                
+                // Check if user exists
+                fetch('/check_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'name=' + encodeURIComponent(name)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        // Existing user - redirect to home
+                        window.location.href = data.redirect;
+                    } else {
+                        // New user - show step 2
+                        document.getElementById('hiddenName').value = name;
+                        showStep('step2');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Something went wrong. Please try again.');
+                    showStep('step1');
+                });
+            });
+        }
     });
+
+    function showStep(stepId) {
+        // Hide all steps
+        const steps = document.querySelectorAll('.login-step');
+        steps.forEach(step => step.style.display = 'none');
+        
+        // Show the requested step
+        const targetStep = document.getElementById(stepId);
+        if (targetStep) {
+            targetStep.style.display = 'block';
+        }
+    }
+
+    function goBackToStep1() {
+        showStep('step1');
+        // Clear the name input for a fresh start if needed
+        // document.getElementById('name').value = '';
+    }
 </script>
 {% endblock %}

@@ -17,7 +17,7 @@
                 <a href="/dashboard" class="nav-link">📊 Progress</a>
                 {% if user %}
                 <div class="user-info">
-                    <img src="{{ url_for('static', filename='images/diana_cartoon.png') }}" alt="Diana" class="nav-avatar">
+                    <img src="{{ url_for('static', filename=user.name|user_avatar) }}" alt="{{ user.name }}" class="nav-avatar">
                     <span class="user-name">Hi, {{ user.name }}! 👋</span>
                     <div class="level-badge">Level {{ user.level }}</div>
                     <div class="points-display">⭐ {{ user.total_points }} points</div>
