@@ -138,14 +138,20 @@ def generate_addition_within_20(difficulty):
         # Simple addition up to 10
         a = random.randint(1, 5)
         b = random.randint(1, 5)
+        hint = f"💡 Try counting on your fingers! Start with {a}, then count up {b} more: {a + 1}, {a + 2}..."
     elif difficulty == 2:
         # Addition up to 15
         a = random.randint(3, 8)
         b = random.randint(2, 7)
+        hint = f"💡 Break it down! Try {a} + {b//2} + {b - b//2} = {a + b//2} + {b - b//2} = ?"
     else:
         # Addition up to 20
         a = random.randint(5, 15)
         b = random.randint(1, 20-a)
+        if a + b > 10:
+            hint = f"💡 Use the 'make 10' strategy! {a} + {b} = {a} + {10-a} + {b-(10-a)} = 10 + {b-(10-a)} = ?"
+        else:
+            hint = f"💡 You can use doubles! Is {a} or {b} close to a double you know?"
     
     question = f"What is {a} + {b}?"
     correct_answer = a + b
@@ -164,7 +170,8 @@ def generate_addition_within_20(difficulty):
         "question": question,
         "options": options,
         "correct_answer": correct_answer,
-        "visual_help": f"🔵 " * a + " + " + "🔴 " * b + " = ?"
+        "visual_help": f"🔵 " * a + " + " + "🔴 " * b + " = ?",
+        "hint": hint
     }
 
 def generate_subtraction_within_20(difficulty):
@@ -174,11 +181,16 @@ def generate_subtraction_within_20(difficulty):
         result = random.randint(0, 5)
         subtract = random.randint(1, 5)
         start = result + subtract
+        hint = f"💡 Think: what number plus {subtract} equals {start}? You can count backwards or use objects to take away!"
     else:
         # Subtraction from numbers up to 20
         result = random.randint(0, 10)
         subtract = random.randint(1, 10)
         start = result + subtract
+        if start > 10:
+            hint = f"💡 Try breaking it down: {start} - {10} = {start-10}, then {start-10} - {subtract-10} = ?"
+        else:
+            hint = f"💡 Count backwards from {start}: {start-1}, {start-2}... or think 'what plus {subtract} equals {start}?'"
     
     question = f"What is {start} - {subtract}?"
     correct_answer = result
@@ -196,7 +208,8 @@ def generate_subtraction_within_20(difficulty):
         "question": question,
         "options": options,
         "correct_answer": correct_answer,
-        "visual_help": f"Start with {start} blocks, take away {subtract}"
+        "visual_help": f"Start with {start} blocks, take away {subtract}",
+        "hint": hint
     }
 
 def generate_counting_to_100(difficulty):
@@ -212,6 +225,11 @@ def generate_counting_to_100(difficulty):
     
     question = f"What number is missing? {' → '.join(sequence_str)}"
     
+    if step == 1:
+        hint = f"💡 Count one by one: {sequence[0]}, {sequence[1] if missing_index != 1 else '?'}... What comes next?"
+    else:
+        hint = f"💡 You're counting by {step}s! Add {step} each time: {sequence[0]} + {step} = {sequence[1]}"
+    
     options = [missing_number]
     while len(options) < 4:
         wrong = missing_number + random.randint(-5, 5)
@@ -224,7 +242,8 @@ def generate_counting_to_100(difficulty):
         "type": "multiple_choice",
         "question": question,
         "options": options,
-        "correct_answer": missing_number
+        "correct_answer": missing_number,
+        "hint": hint
     }
 
 def generate_place_value(difficulty):
@@ -254,12 +273,22 @@ def generate_place_value(difficulty):
     
     random.shuffle(options)
     
+    # Generate contextual hints
+    if difficulty == 1:
+        if "tens" in question:
+            hint = f"💡 Look at the tens place (the leftmost digit in {number}). The digit {tens} means {tens} groups of 10!"
+        else:  # ones
+            hint = f"💡 Look at the ones place (the rightmost digit in {number}). The digit {ones} means {ones} single units!"
+    else:  # hundreds
+        hint = f"💡 Look at the hundreds place (the leftmost digit in {number}). The digit {hundreds} means {hundreds} groups of 100!"
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": options,
         "correct_answer": correct_answer,
-        "visual_help": f"Think about {number} as groups of tens and ones"
+        "visual_help": f"Think about {number} as groups of tens and ones",
+        "hint": hint
     }
 
 def generate_comparing_numbers(difficulty):
@@ -278,14 +307,17 @@ def generate_comparing_numbers(difficulty):
     
     if a > b:
         correct_answer = ">"
+        hint = f"💡 {a} is bigger than {b}. The symbol > opens to the bigger number. Think: 'alligator mouth eats the bigger number'!"
     else:
         correct_answer = "<"
+        hint = f"💡 {a} is smaller than {b}. The symbol < opens to the bigger number. Think: 'alligator mouth eats the bigger number'!"
     
     return {
         "type": "multiple_choice",
         "question": question,
         "options": [">", "<", "="],
-        "correct_answer": correct_answer
+        "correct_answer": correct_answer,
+        "hint": hint
     }
 
 def generate_multiplication_arrays(difficulty):
@@ -308,12 +340,24 @@ def generate_multiplication_arrays(difficulty):
     
     random.shuffle(options)
     
+    # Generate contextual hints
+    if multiplier in [2, 5, 10]:
+        if multiplier == 2:
+            hint = f"💡 Think: {multiplicand} groups of 2 means adding 2 + 2 + 2... Count by 2s: 2, 4, 6..."
+        elif multiplier == 5:
+            hint = f"💡 Think: {multiplicand} groups of 5. Count by 5s: 5, 10, 15... Use your fingers!"
+        else:  # multiplier == 10
+            hint = f"💡 Think: {multiplicand} groups of 10. Count by 10s: 10, 20, 30... Just add a zero to {multiplicand}!"
+    else:
+        hint = f"💡 Think: {multiplicand} groups of {multiplier}. You can add {multiplier} + {multiplier} + {multiplier}... or draw {multiplicand} circles with {multiplier} dots in each!"
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": options,
         "correct_answer": correct_answer,
-        "visual_help": f"Draw {multiplicand} groups with {multiplier} items in each group"
+        "visual_help": f"Draw {multiplicand} groups with {multiplier} items in each group",
+        "hint": hint
     }
 
 def generate_fractions_halves_quarters(difficulty):
@@ -357,12 +401,23 @@ def generate_fractions_halves_quarters(difficulty):
     # Create visual representation
     visual_help = create_fraction_visual(shape, parts, shaded, name)
     
+    # Generate contextual hints
+    if correct_answer == "1/2":
+        hint = f"💡 The shape is split into 2 equal parts and 1 is shaded. This is 'one half' or 1/2!"
+    elif correct_answer == "1/4":
+        hint = f"💡 The shape is split into 4 equal parts and 1 is shaded. This is 'one quarter' or 1/4!"
+    elif correct_answer == "2/4":
+        hint = f"💡 The shape has 4 equal parts and 2 are shaded. Count: 2 out of 4 = 2/4!"
+    else:  # 3/4
+        hint = f"💡 Count the shaded parts: 3 out of 4 total parts are shaded. That's 3/4!"
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": options,
         "correct_answer": correct_answer,
-        "visual_help": visual_help
+        "visual_help": visual_help,
+        "hint": hint
     }
 
 def create_fraction_visual(shape, parts, shaded, name):
@@ -468,11 +523,26 @@ def generate_2d_shapes(difficulty):
     
     random.shuffle(options)
     
+    # Generate contextual hints
+    if correct_shape == "triangle":
+        hint = f"💡 Think about shapes you see every day! A triangle has 3 sides and 3 corners - like a slice of pizza! 🍕"
+    elif correct_shape == "square":
+        hint = f"💡 A square has 4 equal sides and 4 corners - like a window or dice! All sides are the same length. 🎲"
+    elif correct_shape == "rectangle":
+        hint = f"💡 A rectangle has 4 sides and 4 corners, but opposite sides are equal - like a door or book! 📚"
+    elif correct_shape == "circle":
+        hint = f"💡 A circle is perfectly round with no corners - like a wheel or ball! ⚽"
+    elif correct_shape == "pentagon":
+        hint = f"💡 A pentagon has 5 sides and 5 corners - like a house shape with a roof! Count the sides carefully."
+    else:  # hexagon
+        hint = f"💡 A hexagon has 6 sides and 6 corners - like a stop sign! Count each side: 1, 2, 3, 4, 5, 6."
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": options,
-        "correct_answer": correct_shape
+        "correct_answer": correct_shape,
+        "hint": hint
     }
 
 def generate_time_reading(difficulty):
@@ -559,12 +629,19 @@ def generate_time_reading(difficulty):
     # Shuffle the options AFTER we've stored the correct answer
     random.shuffle(all_options)
     
+    # Generate contextual hints
+    if minute == 0:
+        hint = f"💡 Look at the short hand (hour hand) - it points to {hour}. When the long hand points to 12, it's 'o'clock'!"
+    else:  # minute == 30
+        hint = f"💡 The long hand (minute hand) points to 6, which means 30 minutes or 'half past'. The short hand is between {hour} and {hour + 1 if hour < 12 else 1}!"
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": all_options,
         "correct_answer": correct_answer,  # This stays the same regardless of shuffle
-        "visual_help": visual_help
+        "visual_help": visual_help,
+        "hint": hint
     }
 
 def generate_skip_counting(difficulty):
@@ -594,12 +671,23 @@ def generate_skip_counting(difficulty):
     
     random.shuffle(options)
     
+    # Generate contextual hints
+    if step == 2:
+        hint = f"💡 Counting by 2s! Start at {start}, add 2 each time: {start}, {start+step}, {start+2*step}... What comes next?"
+    elif step == 5:
+        hint = f"💡 Counting by 5s! Think of your fingers - each hand has 5 fingers. Count: {start}, {start+step}, {start+2*step}..."
+    elif step == 10:
+        hint = f"💡 Counting by 10s! This is easy - just add 10 each time: {start}, {start+step}, {start+2*step}..."
+    else:
+        hint = f"💡 You're counting by {step}s! Add {step} each time. What number comes before and after the missing spot?"
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": options,
         "correct_answer": missing_number,
-        "visual_help": f"Count in steps of {step}"
+        "visual_help": f"Count in steps of {step}",
+        "hint": hint
     }
 
 def generate_simple_division(difficulty):
@@ -628,12 +716,16 @@ def generate_simple_division(difficulty):
     
     random.shuffle(options)
     
+    # Generate contextual hints
+    hint = f"💡 Think: you have {dividend} items to share fairly among {divisor} groups. Try drawing {divisor} circles and putting one item in each circle at a time until all items are shared!"
+    
     return {
         "type": "multiple_choice",
         "question": question,
         "options": options,
         "correct_answer": correct_answer,
-        "visual_help": f"Draw {divisor} groups and share {dividend} items equally"
+        "visual_help": f"Draw {divisor} groups and share {dividend} items equally",
+        "hint": hint
     }
 
 def generate_length_height(difficulty):

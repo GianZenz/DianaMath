@@ -3,41 +3,53 @@
 {% block title %}{{ topic }} - DianaMath{% endblock %}
 
 {% block content %}
-<div class="learn-container">
-    <div class="topic-header">
-        <h1 class="topic-title">{{ topic }} 📚</h1>
-        <p class="topic-description">Choose a skill to practice!</p>
+<div class="home-container">
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <div class="welcome-text">
+                <h1 class="welcome-title">{{ topic }} 📚</h1>
+                <p class="welcome-subtitle">Choose a skill to practice!</p>
+            </div>
+        </div>
     </div>
 
-    <div class="subtopics-grid">
-        {% for subtopic in curriculum %}
-        <a href="/exercise/{{ topic }}/{{ subtopic }}" class="subtopic-card">
-            <div class="subtopic-content">
-                <h3 class="subtopic-title">{{ subtopic.replace('_', ' ').title() }}</h3>
-                <div class="subtopic-icon">
-                    {% if 'addition' in subtopic %}🟢
-                    {% elif 'subtraction' in subtopic %}🔴
-                    {% elif 'multiplication' in subtopic %}🟡
-                    {% elif 'counting' in subtopic %}🔵
+    <div class="topics-grid">
+        <h2 class="section-title">Select Your Practice Exercise! 🎯</h2>
+        
+        <div class="topic-cards">
+            {% for subtopic in curriculum %}
+            <a href="/exercise/{{ topic }}/{{ subtopic }}" class="topic-card {% if 'addition' in subtopic %}addition-card{% elif 'subtraction' in subtopic %}number-card{% elif 'multiplication' in subtopic %}multiplication-card{% elif 'counting' in subtopic %}number-card{% elif 'place_value' in subtopic %}number-card{% elif 'comparing' in subtopic %}number-card{% elif 'fractions' in subtopic %}fractions-card{% elif 'shapes' in subtopic %}geometry-card{% elif 'time' in subtopic %}measurement-card{% else %}number-card{% endif %}">
+                <div class="topic-icon">
+                    {% if 'addition' in subtopic %}➕
+                    {% elif 'subtraction' in subtopic %}➖
+                    {% elif 'multiplication' in subtopic %}✖️
+                    {% elif 'division' in subtopic %}➗
+                    {% elif 'counting' in subtopic %}🔢
                     {% elif 'place_value' in subtopic %}📊
                     {% elif 'comparing' in subtopic %}⚖️
                     {% elif 'fractions' in subtopic %}🍰
                     {% elif 'shapes' in subtopic %}🔷
                     {% elif 'time' in subtopic %}⏰
+                    {% elif 'skip' in subtopic %}🔢
+                    {% elif 'length' in subtopic %}📏
+                    {% elif 'mass' in subtopic %}⚖️
+                    {% elif 'temperature' in subtopic %}🌡️
+                    {% elif 'position' in subtopic %}🧭
                     {% else %}⭐
                     {% endif %}
-                    </div>
-                <p class="subtopic-description">Practice and improve your skills!</p>
-                <div class="difficulty-indicator">
-                    <span class="difficulty-label">Ready to start!</span>
                 </div>
-            </div>
-        </a>
-        {% endfor %}
+                <h3>{{ subtopic.replace('_', ' ').title() }}</h3>
+                <p>Practice and improve your skills!</p>
+                <div class="difficulty-badge">Ready to start!</div>
+            </a>
+            {% endfor %}
+        </div>
     </div>
 
-    <div class="back-button-container">
-        <a href="/" class="back-button">← Back to Home</a>
+    <div class="motivation-section">
+        <div class="motivation-card">
+            <a href="/" class="back-button">← Back to Home</a>
+        </div>
     </div>
 </div>
 {% endblock %}

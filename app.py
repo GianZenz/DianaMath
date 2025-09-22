@@ -323,6 +323,39 @@ def dashboard():
                          progress_data=progress_data,
                          achievements=achievements)
 
+@app.route('/settings')
+def settings():
+    """User settings page"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect('/')
+    
+    user = User.query.get_or_404(user_id)
+    return render_template('settings.html', user=user)
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    """Update user profile settings"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect('/')
+    
+    user = User.query.get_or_404(user_id)
+    
+    # Get form data
+    name = request.form.get('name', '').strip()
+    current_year = request.form.get('current_year', type=int)
+    
+    # Validate inputs
+    if name and len(name) <= 100:
+        user.name = name
+    
+    if current_year and 1 <= current_year <= 7:  # Primary 1-7
+        user.current_year = current_year
+    
+    db.session.commit()
+    return redirect('/settings?updated=1')
+
 @app.route('/logout')
 def logout():
     session.clear()

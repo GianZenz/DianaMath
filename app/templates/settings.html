@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - DianaMath{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <div class="welcome-text">
+                <h1 class="welcome-title">Settings ⚙️</h1>
+                <p class="welcome-subtitle">Update your profile information</p>
+            </div>
+        </div>
+    </div>
+
+    {% if request.args.get('updated') %}
+    <div class="success-message">
+        <p>✅ Settings updated successfully!</p>
+    </div>
+    {% endif %}
+
+    <div class="topics-grid">
+        <div class="settings-container">
+            <div class="settings-card">
+                <h2>👤 Profile Information</h2>
+                
+                <form action="/update_profile" method="POST" class="settings-form">
+                    <div class="form-group">
+                        <label for="name">📝 Name:</label>
+                        <input type="text" id="name" name="name" value="{{ user.name }}" required maxlength="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="current_year">📚 Primary Year:</label>
+                        <select id="current_year" name="current_year" required>
+                            <option value="1" {% if user.current_year == 1 %}selected{% endif %}>Primary 1</option>
+                            <option value="2" {% if user.current_year == 2 %}selected{% endif %}>Primary 2</option>
+                            <option value="3" {% if user.current_year == 3 %}selected{% endif %}>Primary 3</option>
+                            <option value="4" {% if user.current_year == 4 %}selected{% endif %}>Primary 4</option>
+                            <option value="5" {% if user.current_year == 5 %}selected{% endif %}>Primary 5</option>
+                            <option value="6" {% if user.current_year == 6 %}selected{% endif %}>Primary 6</option>
+                            <option value="7" {% if user.current_year == 7 %}selected{% endif %}>Primary 7</option>
+                        </select>
+                        <small>Choose your current school year (Northern Ireland Curriculum)</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">💾 Save Changes</button>
+                        <a href="/" class="cancel-button">❌ Cancel</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="info-card">
+                <h3>📊 Your Progress</h3>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Level:</span>
+                        <span class="stat-value">{{ user.level }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Points:</span>
+                        <span class="stat-value">{{ user.total_points }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Member since:</span>
+                        <span class="stat-value">{{ user.created_at.strftime('%b %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="motivation-section">
+        <div class="motivation-card">
+            <a href="/" class="back-button">← Back to Home</a>
+            <a href="/dashboard" class="back-button">📊 View Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
