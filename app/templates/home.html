@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="home-container">
+    {% if user %}
+    <!-- Logged in user content -->
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <div class="diana-avatar">
+                <img src="{{ url_for('static', filename='images/diana_cartoon.png') }}" alt="Diana's Avatar" class="diana-image">
+                <div class="speech-bubble">
+                    <p>Hi! I'm ready for math! 🌟</p>
+                </div>
+            </div>
+            <div class="welcome-text">
+                <h1 class="welcome-title">Welcome back, {{ user.name }}! 🎉</h1>
+                <p class="welcome-subtitle">Let's continue your math adventure!</p>
+            </div>
+        </div>
+        
+        <div class="user-stats">
+            <div class="stat-card">
+                <h3>🌟 Your Level</h3>
+                <div class="level-number">{{ user.level }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>⭐ Total Points</h3>
+                <div class="points-number">{{ user.total_points }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>📚 Primary Year</h3>
+                <div class="year-number">Primary {{ user.current_year }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="topics-grid">
+        <h2 class="section-title">Choose Your Math Adventure! 🚀</h2>
+        
+        <div class="topic-cards">
+            <a href="/learn/Number and Place Value" class="topic-card number-card">
+                <div class="topic-icon">🔢</div>
+                <h3>Numbers</h3>
+                <p>Count, compare, and understand numbers!</p>
+            </a>
+
+            <a href="/learn/Addition and Subtraction" class="topic-card addition-card">
+                <div class="topic-icon">➕</div>
+                <h3>Addition & Subtraction</h3>
+                <p>Add and take away numbers like a pro!</p>
+            </a>
+
+            <a href="/learn/Multiplication and Division" class="topic-card multiplication-card">
+                <div class="topic-icon">✖️</div>
+                <h3>Times & Division</h3>
+                <p>Groups, arrays, and sharing fairly!</p>
+            </a>
+
+            <a href="/learn/Fractions" class="topic-card fractions-card">
+                <div class="topic-icon">🍰</div>
+                <h3>Fractions</h3>
+                <p>Parts of a whole - like pieces of cake!</p>
+            </a>
+
+            <a href="/learn/Measurement" class="topic-card measurement-card">
+                <div class="topic-icon">📏</div>
+                <h3>Measurement</h3>
+                <p>Length, weight, time, and more!</p>
+            </a>
+
+            <a href="/learn/Geometry" class="topic-card geometry-card">
+                <div class="topic-icon">🔷</div>
+                <h3>Shapes</h3>
+                <p>Circles, squares, and amazing shapes!</p>
+            </a>
+        </div>
+    </div>
+
+    <div class="motivation-section">
+        <div class="motivation-card">
+            <h3>🎯 Today's Goal</h3>
+            <p>Try to earn 50 more points!</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ (user.total_points % 100) }}%"></div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Login form for new users -->
+    <div class="login-section">
+        <h1 class="welcome-title">Welcome to DianaMath! 🎉</h1>
+        <p class="welcome-subtitle">Let's make math fun and exciting!</p>
+        
+        <div class="login-card">
+            <h2>👋 What's your name?</h2>
+            <form action="/login" method="POST" class="login-form">
+                <input type="text" name="name" placeholder="Enter your name..." required class="name-input">
+                <button type="submit" class="start-button">🚀 Start Learning!</button>
+            </form>
+        </div>
+        
+        <div class="preview-section">
+            <h3>🌟 What you'll learn:</h3>
+            <div class="preview-topics">
+                <div class="preview-item">🔢 Numbers & Counting</div>
+                <div class="preview-item">➕ Addition & Subtraction</div>
+                <div class="preview-item">✖️ Multiplication & Division</div>
+                <div class="preview-item">🍰 Fractions</div>
+                <div class="preview-item">📏 Measurement</div>
+                <div class="preview-item">🔷 Shapes & Geometry</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add some fun animations when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.topic-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.animation = 'bounceIn 0.6s ease-out';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

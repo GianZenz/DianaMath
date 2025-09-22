@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subtopic.replace('_', ' ').title() }} - DianaMath{% endblock %}
+
+{% block content %}
+<div class="exercise-container">
+    <div class="exercise-header">
+        <h1 class="exercise-title">{{ subtopic.replace('_', ' ').title() }} 🎯</h1>
+        <div class="breadcrumb">
+            <a href="/">Home</a> → 
+            <a href="/learn/{{ topic }}">{{ topic }}</a> → 
+            <span>{{ subtopic.replace('_', ' ').title() }}</span>
+        </div>
+    </div>
+
+    <div class="exercise-content">
+        <div class="question-card">
+            <h2 class="question-text">{{ exercise.question }}</h2>
+            
+            {% if exercise.visual_help %}
+            <div class="visual-help">
+                {{ exercise.visual_help|safe }}
+            </div>
+            {% endif %}
+            
+            {% if exercise.visual_html %}
+            <div class="visual-content">
+                {{ exercise.visual_html|safe }}
+            </div>
+            {% endif %}
+
+            <div class="options-container">
+                {% for option in exercise.options %}
+                <button class="option-button" data-answer="{{ option }}">
+                    {{ option }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="feedback-area" id="feedback" style="display: none;">
+                <div class="feedback-content">
+                    <div class="feedback-message"></div>
+                    <div class="points-earned"></div>
+                    <button class="next-button" onclick="nextQuestion()">Next Question ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-sidebar">
+            <div class="progress-section">
+                <h3>Your Progress 📈</h3>
+                <div class="progress-info">
+                    <div class="level-display">Level {{ user.level }}</div>
+                    <div class="points-display">{{ user.total_points }} Points</div>
+                </div>
+            </div>
+
+            <div class="hints-section">
+                <h3>Need Help? 💡</h3>
+                <div class="hint-buttons">
+                    <button class="hint-button" onclick="showHint()">Show Hint</button>
+                    <button class="hint-button" onclick="skipQuestion()">Skip Question</button>
+                </div>
+            </div>
+
+            <div class="achievements-preview">
+                <h3>Next Achievement 🏆</h3>
+                <div class="next-achievement">
+                    <p>Perfect Streak: Get 5 in a row!</p>
+                    <div class="achievement-progress">Progress: 🌟🌟⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="confirmation-modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🤔 Ready to Submit?</h3>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to submit "<span id="selectedAnswer"></span>" as your answer?</p>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn cancel-btn" id="cancelBtn">
+                ❌ No, Let Me Think
+            </button>
+            <button class="modal-btn confirm-btn" id="confirmBtn">
+                ✅ Yes, Submit!
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for JavaScript -->
+<script type="text/javascript">
+    const exerciseData = {
+        topic: "{{ topic }}",
+        subtopic: "{{ subtopic }}",
+        correctAnswer: {{ exercise.correct_answer|tojson }}
+    };
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentStreak = 0;
+    let totalQuestions = 0;
+    let correctAnswers = 0;
+    let selectedAnswerForSubmission = null;
+
+    // Handle answer selection
+    document.querySelectorAll('.option-button').forEach(button => {
+        button.addEventListener('click', function() {
+            selectedAnswerForSubmission = this.dataset.answer;
+            showConfirmationModal(selectedAnswerForSubmission);
+        });
+    });
+
+    function showConfirmationModal(answer) {
+        document.getElementById('selectedAnswer').textContent = answer;
+        document.getElementById('confirmationModal').style.display = 'flex';
+        // Prevent body scrolling when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideConfirmationModal() {
+        document.getElementById('confirmationModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        console.log('Hiding modal, resetting selectedAnswerForSubmission from:', selectedAnswerForSubmission);
+        selectedAnswerForSubmission = null;
+    }
+
+    function confirmSubmission() {
+        console.log('confirmSubmission called');
+        console.log('selectedAnswerForSubmission:', selectedAnswerForSubmission);
+        
+        // Store the answer before hiding modal (which resets the variable)
+        const answerToSubmit = selectedAnswerForSubmission;
+        
+        hideConfirmationModal();
+        
+        if (answerToSubmit) {
+            console.log('Submitting answer:', answerToSubmit);
+            submitAnswer(answerToSubmit);
+        } else {
+            console.log('No answer selected for submission');
+        }
+    }
+
+    // Make sure functions are available globally for onclick handlers
+    window.confirmSubmission = confirmSubmission;
+    window.hideConfirmationModal = hideConfirmationModal;
+
+    // Close modal when clicking on overlay
+    document.getElementById('confirmationModal').addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-overlay')) {
+            hideConfirmationModal();
+        }
+    });
+
+    // Add keyboard support for modal
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('confirmationModal');
+        if (modal.style.display === 'flex') {
+            if (e.key === 'Escape') {
+                hideConfirmationModal();
+            } else if (e.key === 'Enter') {
+                confirmSubmission();
+            }
+        }
+    });
+
+    function submitAnswer(answer) {
+        console.log('submitAnswer called with:', answer);
+        
+        const data = {
+            topic: exerciseData.topic,
+            subtopic: exerciseData.subtopic,
+            answer: answer,
+            correct_answer: exerciseData.correctAnswer
+        };
+
+        console.log('Frontend Debug - Answer data being sent:');
+        console.log('  User answer:', answer, '(type:', typeof answer, ')');
+        console.log('  Correct answer:', exerciseData.correctAnswer, '(type:', typeof exerciseData.correctAnswer, ')');
+        console.log('  Full data object:', data);
+
+        console.log('Submitting answer:', data);
+
+        fetch('/submit_answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('Result received:', result);
+            showFeedback(result, answer);
+            updateProgress(result);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Sorry, there was an error submitting your answer. Please try again!');
+        });
+    }
+
+    function showFeedback(result, userAnswer) {
+        const feedbackArea = document.getElementById('feedback');
+        const messageDiv = feedbackArea.querySelector('.feedback-message');
+        const pointsDiv = feedbackArea.querySelector('.points-earned');
+
+        // Disable option buttons
+        document.querySelectorAll('.option-button').forEach(btn => {
+            btn.disabled = true;
+            if (btn.dataset.answer == exerciseData.correctAnswer) {
+                btn.classList.add('correct');
+            } else if (btn.dataset.answer == userAnswer && !result.correct) {
+                btn.classList.add('incorrect');
+            }
+        });
+
+        // Show feedback message
+        if (result.correct) {
+            let successMessage = `
+                <div class="success-message">
+                    <img src="{{ url_for('static', filename='images/diana_celebration.png') }}" alt="Diana celebrates correct answer" class="diana-success" onerror="this.style.display='none'">
+                    <div class="success-content">
+                        <div class="success-text">🎉 Correct! Well done!</div>
+                        ${result.level_up ? '<div class="level-up-text">🆙 Level Up!</div>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Add achievement notifications
+            if (result.achievements && result.achievements.length > 0) {
+                result.achievements.forEach(achievement => {
+                    successMessage += `<br>🏆 <strong>${achievement.name}</strong>: ${achievement.description} (+${achievement.points} pts)`;
+                });
+            }
+            
+            messageDiv.innerHTML = successMessage;
+            currentStreak++;
+            // Play success sound
+            if (window.DianaMath) {
+                window.DianaMath.playSound('correct');
+            }
+        } else {
+            messageDiv.innerHTML = `
+                <div class="error-message">
+                    <img src="{{ url_for('static', filename='images/diana_thumbs_up.png') }}" alt="Diana encourages with thumbs up" class="diana-encourage" onerror="this.style.display='none'">
+                    <div class="error-content">
+                        <div class="error-text">🤔 Not quite right. The answer was ${exerciseData.correctAnswer}</div>
+                        <div class="encouragement">Keep trying! You've got this!</div>
+                    </div>
+                </div>
+            `;
+            currentStreak = 0;
+            // Play error sound
+            if (window.DianaMath) {
+                window.DianaMath.playSound('incorrect');
+            }
+        }
+
+        pointsDiv.innerHTML = `
+            <div class="points-info">
+                ⭐ +${result.points_earned} points!
+                <br>Total: ${result.total_points} points
+                ${result.achievements && result.achievements.length > 0 ? 
+                    '<br>🏆 New Achievement!' : ''}
+            </div>
+        `;
+
+        feedbackArea.style.display = 'block';
+        feedbackArea.scrollIntoView({ behavior: 'smooth' });
+        
+        // Show achievements if any
+        if (result.achievements && result.achievements.length > 0) {
+            setTimeout(() => {
+                result.achievements.forEach(achievement => {
+                    if (window.DianaMath) {
+                        window.DianaMath.showCelebration(`🏆 ${achievement.name}! ${achievement.description}`);
+                    }
+                    showAchievementBanner(achievement);
+                });
+            }, 1000);
+        }
+    }
+
+    function updateProgress(result) {
+        // Update the UI with new progress
+        document.querySelector('.level-display').textContent = `Level ${result.level}`;
+        document.querySelector('.points-display').textContent = `${result.total_points} Points`;
+        
+        totalQuestions++;
+        if (result.correct) {
+            correctAnswers++;
+        }
+        
+        // Show achievement celebration if any
+        if (result.achievements && result.achievements.length > 0) {
+            setTimeout(() => {
+                result.achievements.forEach(achievement => {
+                    showAchievementBanner(achievement);
+                });
+            }, 1500);
+        }
+    }
+
+    function nextQuestion() {
+        // Reload the page to get a new question
+        window.location.reload();
+    }
+    
+    function showAchievementBanner(achievement) {
+        // Create achievement banner element
+        const banner = document.createElement('div');
+        banner.className = 'achievement-banner';
+        
+        // Determine Diana image and styling based on achievement type
+        const dianaImage = achievement.type === 'encouragement' ? 'diana_thumbs_up.png' : 'diana_celebration.png';
+        const dianaAlt = achievement.type === 'encouragement' ? 'Diana encourages' : 'Diana celebrates';
+        const dianaClass = achievement.type === 'encouragement' ? 'achievement-diana-encourage' : 'achievement-diana-celebration';
+        const title = achievement.type === 'encouragement' ? '👍 Keep Going!' : '🎉 Achievement Unlocked!';
+        const icon = achievement.type === 'encouragement' ? '💪' : '🏆';
+        
+        banner.innerHTML = `
+            <div class="achievement-content">
+                <img src="{{ url_for('static', filename='images/') }}${dianaImage}" alt="${dianaAlt}" class="${dianaClass}" onerror="this.style.display='none'">
+                <div class="achievement-text">
+                    <div class="achievement-title">${title}</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-desc">${achievement.description}</div>
+                    <div class="achievement-points">+${achievement.points} bonus points!</div>
+                </div>
+                <div class="achievement-icon">${icon}</div>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(banner);
+        
+        // Animate in
+        setTimeout(() => banner.classList.add('show'), 100);
+        
+        // Remove after 4 seconds
+        setTimeout(() => {
+            banner.classList.remove('show');
+            setTimeout(() => document.body.removeChild(banner), 500);
+        }, 4000);
+    }
+
+    function showHint() {
+        alert("💡 Think step by step. You can do this!");
+    }
+
+    function skipQuestion() {
+        if (confirm("Are you sure you want to skip this question?")) {
+            nextQuestion();
+        }
+    }
+
+    // Add some encouraging animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const questionCard = document.querySelector('.question-card');
+        questionCard.style.animation = 'slideInUp 0.5s ease-out';
+        
+        // Add modal button event listeners
+        document.getElementById('cancelBtn').addEventListener('click', hideConfirmationModal);
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            console.log('Confirm button clicked!');
+            confirmSubmission();
+        });
+        
+        // Add click animations to buttons
+        document.querySelectorAll('.option-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.animation = 'pulse 0.3s ease';
+            });
+        });
+    });
+</script>
+{% endblock %}

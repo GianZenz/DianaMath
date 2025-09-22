@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Progress Dashboard - DianaMath{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">{{ user.name }}'s Progress Dashboard 📊</h1>
+        <p class="dashboard-subtitle">Look how amazing you're doing!</p>
+    </div>
+
+    <div class="stats-overview">
+        <div class="stat-card large">
+            <h3>🌟 Current Level</h3>
+            <div class="stat-value">{{ user.level }}</div>
+            <div class="stat-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                </div>
+                <p>75% to next level!</p>
+            </div>
+        </div>
+
+        <div class="stat-card large">
+            <h3>⭐ Total Points</h3>
+            <div class="stat-value">{{ user.total_points }}</div>
+            <div class="stat-subtext">Keep collecting stars!</div>
+        </div>
+
+        <div class="stat-card large">
+            <h3>📚 Primary Year</h3>
+            <div class="stat-value">Primary {{ user.current_year }}</div>
+            <div class="stat-subtext">Northern Ireland Curriculum</div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="achievements-section">
+            <h2 class="section-title">🏆 Your Achievements</h2>
+            <div class="achievements-grid">
+                {% if achievements %}
+                    {% for achievement in achievements %}
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">{{ achievement.badge_name }}</div>
+                        <h4>{{ achievement.badge_name }}</h4>
+                        <p>Earned {{ achievement.earned_at.strftime('%d %b') }}</p>
+                        <div class="achievement-points">+{{ achievement.points_earned }} points</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-achievements">
+                        <p>🎯 Start practicing to earn your first achievement!</p>
+                    </div>
+                {% endif %}
+                
+                <!-- Show some locked achievements to motivate -->
+                <div class="achievement-card locked">
+                    <div class="achievement-icon">🔒</div>
+                    <h4>Perfect Streak</h4>
+                    <p>Get 5 questions right in a row</p>
+                </div>
+                <div class="achievement-card locked">
+                    <div class="achievement-icon">🔒</div>
+                    <h4>Math Explorer</h4>
+                    <p>Try 5 different topics</p>
+                </div>
+                <div class="achievement-card locked">
+                    <div class="achievement-icon">🔒</div>
+                    <h4>Rising Star</h4>
+                    <p>Reach level 5</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h2 class="section-title">📈 Topic Progress</h2>
+            <div class="progress-grid">
+                {% if progress_data %}
+                    {% for progress in progress_data %}
+                    <div class="progress-card">
+                        <h4>{{ progress.topic }}</h4>
+                        <p class="subtopic">{{ progress.subtopic.replace('_', ' ').title() }}</p>
+                        <div class="progress-stats">
+                            <div class="accuracy">
+                                <span class="label">Accuracy:</span>
+                                <span class="value">{{ ((progress.correct_answers / progress.total_attempts) * 100) | round(1) }}%</span>
+                            </div>
+                            <div class="attempts">
+                                <span class="label">Problems:</span>
+                                <span class="value">{{ progress.total_attempts }}</span>
+                            </div>
+                            <div class="difficulty">
+                                <span class="label">Level:</span>
+                                <span class="value">{{ progress.difficulty }}/5</span>
+                            </div>
+                        </div>
+                        <div class="last-practiced">
+                            Last practiced: {{ progress.last_attempted.strftime('%d %b %Y') }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-progress">
+                        <p>🚀 Start your math journey by choosing a topic!</p>
+                        <a href="/" class="start-button">Begin Learning</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="recommendations-section">
+            <h2 class="section-title">💡 Recommended for You</h2>
+            <div class="recommendations-grid">
+                <div class="recommendation-card">
+                    <h4>🟢 Practice Addition</h4>
+                    <p>You're doing great! Try some harder problems.</p>
+                    <a href="/learn/Addition and Subtraction" class="recommendation-link">Try Now →</a>
+                </div>
+                <div class="recommendation-card">
+                    <h4>🔷 Explore Shapes</h4>
+                    <p>Learn about circles, squares, and triangles!</p>
+                    <a href="/learn/Geometry" class="recommendation-link">Try Now →</a>
+                </div>
+                <div class="recommendation-card">
+                    <h4>🍰 Try Fractions</h4>
+                    <p>Ready for a new challenge? Fractions are fun!</p>
+                    <a href="/learn/Fractions" class="recommendation-link">Try Now →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="parent-section">
+        <h2 class="section-title">👨‍👩‍👧 For Parents</h2>
+        <div class="parent-info">
+            <div class="parent-card">
+                <h4>Learning Summary</h4>
+                <ul>
+                    <li>Current focus: Addition and basic number skills</li>
+                    <li>Strengths: Quick mental math, enjoys problem solving</li>
+                    <li>Areas to practice: Place value, time telling</li>
+                    <li>Recommended practice time: 15-20 minutes daily</li>
+                    <li>Following Northern Ireland Primary curriculum</li>
+                </ul>
+            </div>
+            <div class="parent-card">
+                <h4>Recent Activity</h4>
+                <ul>
+                    <li>✅ Completed 12 addition problems (92% accuracy)</li>
+                    <li>✅ Practiced counting to 100</li>
+                    <li>✅ Earned "First Steps" achievement</li>
+                    <li>📅 Last session: Today at 4:30 PM</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add animations and interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate achievement cards
+        const achievementCards = document.querySelectorAll('.achievement-card');
+        achievementCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.animation = 'bounceIn 0.6s ease-out';
+            }, index * 100);
+        });
+
+        // Add hover effects to progress cards
+        const progressCards = document.querySelectorAll('.progress-card');
+        progressCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+            });
+        });
+
+        // Animate progress bars
+        const progressBars = document.querySelectorAll('.progress-fill');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+                bar.style.transition = 'width 1s ease-out';
+            }, 500);
+        });
+    });
+</script>
+{% endblock %}

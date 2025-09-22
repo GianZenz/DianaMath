@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic }} - DianaMath{% endblock %}
+
+{% block content %}
+<div class="learn-container">
+    <div class="topic-header">
+        <h1 class="topic-title">{{ topic }} 📚</h1>
+        <p class="topic-description">Choose a skill to practice!</p>
+    </div>
+
+    <div class="subtopics-grid">
+        {% for subtopic in curriculum %}
+        <a href="/exercise/{{ topic }}/{{ subtopic }}" class="subtopic-card">
+            <div class="subtopic-content">
+                <h3 class="subtopic-title">{{ subtopic.replace('_', ' ').title() }}</h3>
+                <div class="subtopic-icon">
+                    {% if 'addition' in subtopic %}🟢
+                    {% elif 'subtraction' in subtopic %}🔴
+                    {% elif 'multiplication' in subtopic %}🟡
+                    {% elif 'counting' in subtopic %}🔵
+                    {% elif 'place_value' in subtopic %}📊
+                    {% elif 'comparing' in subtopic %}⚖️
+                    {% elif 'fractions' in subtopic %}🍰
+                    {% elif 'shapes' in subtopic %}🔷
+                    {% elif 'time' in subtopic %}⏰
+                    {% else %}⭐
+                    {% endif %}
+                    </div>
+                <p class="subtopic-description">Practice and improve your skills!</p>
+                <div class="difficulty-indicator">
+                    <span class="difficulty-label">Ready to start!</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="back-button-container">
+        <a href="/" class="back-button">← Back to Home</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add hover effects and animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.subtopic-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DianaMath - Fun Math Learning!{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">🧮 DianaMath</h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link">🏠 Home</a>
+                <a href="/dashboard" class="nav-link">📊 Progress</a>
+                {% if user %}
+                <div class="user-info">
+                    <img src="{{ url_for('static', filename='images/diana_cartoon.png') }}" alt="Diana" class="nav-avatar">
+                    <span class="user-name">Hi, {{ user.name }}! 👋</span>
+                    <div class="level-badge">Level {{ user.level }}</div>
+                    <div class="points-display">⭐ {{ user.total_points }} points</div>
+                    <a href="/logout" class="nav-link logout-link">🚪 Logout</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>Keep learning and having fun with math! 🌟</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
