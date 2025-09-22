@@ -1,4 +1,4 @@
-/* DianaMath - Child-friendly CSS Styles */
+﻿/* DianaMath - Child-friendly CSS Styles */
 
 * {
     margin: 0;
@@ -749,7 +749,7 @@ body {
 }
 
 .error-message {
-    color: #FF9800;
+    color: #ff8c00;
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
@@ -758,20 +758,82 @@ body {
     justify-content: center;
     gap: 20px;
     padding: 20px;
-    background: linear-gradient(45deg, #fff3e0, #ffeaa7);
+    background: linear-gradient(45deg, #fff8f0, #fffaf5);
     border-radius: 15px;
-    border: 2px solid #FFB74D;
+    border: 2px solid #ff8c00;
+    position: relative;
+    overflow: hidden;
+    animation: error-encourage-bounce 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.error-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 140, 0, 0.3), transparent);
+    animation: encourage-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes error-encourage-bounce {
+    0% {
+        transform: translateX(-30px) scale(0.9) rotate(-3deg);
+        opacity: 0;
+        filter: brightness(0.8) hue-rotate(-10deg);
+    }
+    50% {
+        transform: translateX(10px) scale(1.05) rotate(1deg);
+        opacity: 1;
+        filter: brightness(1.2) hue-rotate(5deg);
+    }
+    100% {
+        transform: translateX(0) scale(1) rotate(0deg);
+        opacity: 1;
+        filter: brightness(1) hue-rotate(0deg);
+    }
+}
+
+@keyframes encourage-shimmer {
+    0%, 100% {
+        left: -100%;
+        opacity: 0;
+    }
+    50% {
+        left: 100%;
+        opacity: 1;
+    }
+}
+
+@keyframes heart-pulse {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.7;
+    }
+    25% {
+        transform: scale(1.3) rotate(5deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.9) rotate(-3deg);
+        opacity: 0.8;
+    }
+    75% {
+        transform: scale(1.1) rotate(2deg);
+        opacity: 1;
+    }
 }
 
 .diana-encourage {
     width: 80px;
     height: 80px;
     border-radius: 15px;
-    border: 3px solid #4CAF50;
+    border: 3px solid #ff8c00;
     object-fit: cover;
     animation: thumbs-up-bounce 1s ease-in-out;
-    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
-    background: linear-gradient(45deg, #e8f5e8, #f0fff0);
+    box-shadow: 0 6px 15px rgba(255, 140, 0, 0.3);
+    background: linear-gradient(45deg, #fff8f0, #fffaf5);
     padding: 3px;
 }
 
@@ -786,7 +848,7 @@ body {
 
 .encouragement {
     font-size: 1em;
-    color: #4CAF50;
+    color: #ff8c00;
     font-style: italic;
     font-weight: bold;
 }
@@ -909,20 +971,6 @@ body {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Basic Modal Styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 /* Confirmation Modal Styles */
 .confirmation-modal {
     position: fixed;
@@ -1013,47 +1061,6 @@ body {
 .confirm-btn {
     background: linear-gradient(135deg, #4ecdc4, #44a08d);
     color: white;
-}
-
-/* Additional button classes for modal */
-.modal-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.btn-primary, .btn-secondary {
-    padding: 1rem 1.5rem;
-    border: none;
-    border-radius: 15px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    min-width: 160px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #4ecdc4, #44a08d);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
-}
-
-.btn-secondary {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    color: white;
-}
-
-.btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
 }
 
 .confirm-btn:hover {

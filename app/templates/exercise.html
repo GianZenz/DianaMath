@@ -95,6 +95,47 @@
     </div>
 </div>
 
+<!-- Hint Modal -->
+<div id="hintModal" class="confirmation-modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>💡 Helpful Hint</h3>
+        </div>
+        <div class="modal-body">
+            <p>Think step by step. Break the problem down into smaller parts.</p>
+            <p><strong>Remember:</strong> You can do this! Take your time and think carefully.</p>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn confirm-btn" id="closeHintBtn">
+                ✨ Got It, Thanks!
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Skip Question Modal -->
+<div id="skipModal" class="confirmation-modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>⏭️ Skip This Question?</h3>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to skip this question and move to the next one?</p>
+            <p><em>Don't worry - you can always come back to practice more!</em></p>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn cancel-btn" id="cancelSkipBtn">
+                ❌ No, I'll Try Again
+            </button>
+            <button class="modal-btn confirm-btn" id="confirmSkipBtn">
+                ⏭️ Yes, Skip This One
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Hidden data for JavaScript -->
 <script type="text/javascript">
     const exerciseData = {
@@ -162,14 +203,42 @@
         }
     });
 
-    // Add keyboard support for modal
+    // Add click-outside support for hint modal
+    document.getElementById('hintModal').addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-overlay')) {
+            document.getElementById('hintModal').style.display = 'none';
+        }
+    });
+
+    // Add click-outside support for skip modal
+    document.getElementById('skipModal').addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-overlay')) {
+            document.getElementById('skipModal').style.display = 'none';
+        }
+    });
+
+    // Add keyboard support for modals
     document.addEventListener('keydown', function(e) {
-        const modal = document.getElementById('confirmationModal');
-        if (modal.style.display === 'flex') {
+        const confirmationModal = document.getElementById('confirmationModal');
+        const hintModal = document.getElementById('hintModal');
+        const skipModal = document.getElementById('skipModal');
+        
+        if (confirmationModal.style.display === 'flex') {
             if (e.key === 'Escape') {
                 hideConfirmationModal();
             } else if (e.key === 'Enter') {
                 confirmSubmission();
+            }
+        } else if (hintModal.style.display === 'flex') {
+            if (e.key === 'Escape' || e.key === 'Enter') {
+                hintModal.style.display = 'none';
+            }
+        } else if (skipModal.style.display === 'flex') {
+            if (e.key === 'Escape') {
+                skipModal.style.display = 'none';
+            } else if (e.key === 'Enter') {
+                skipModal.style.display = 'none';
+                nextQuestion();
             }
         }
     });
@@ -362,13 +431,11 @@
     }
 
     function showHint() {
-        alert("💡 Think step by step. You can do this!");
+        document.getElementById('hintModal').style.display = 'flex';
     }
 
     function skipQuestion() {
-        if (confirm("Are you sure you want to skip this question?")) {
-            nextQuestion();
-        }
+        document.getElementById('skipModal').style.display = 'flex';
     }
 
     // Add some encouraging animations
@@ -381,6 +448,20 @@
         document.getElementById('confirmBtn').addEventListener('click', function() {
             console.log('Confirm button clicked!');
             confirmSubmission();
+        });
+        
+        // Add hint modal event listeners
+        document.getElementById('closeHintBtn').addEventListener('click', function() {
+            document.getElementById('hintModal').style.display = 'none';
+        });
+        
+        // Add skip modal event listeners
+        document.getElementById('cancelSkipBtn').addEventListener('click', function() {
+            document.getElementById('skipModal').style.display = 'none';
+        });
+        document.getElementById('confirmSkipBtn').addEventListener('click', function() {
+            document.getElementById('skipModal').style.display = 'none';
+            nextQuestion();
         });
         
         // Add click animations to buttons
